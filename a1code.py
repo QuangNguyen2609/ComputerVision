@@ -23,7 +23,7 @@ def load(img_path):
     
     out = None
     # YOUR CODE HERE
-    
+    out = io.imread(img_path) / 255.0
     return out
 
 def print_stats(image):
@@ -37,7 +37,9 @@ def print_stats(image):
     """
     
     # YOUR CODE HERE
-    
+    print("Height: ", image.shape[0])
+    print("Width: ", image.shape[1])
+    print("Channels: ", image.shape[2])
     return None
 
 def crop(image, start_row, start_col, num_rows, num_cols):
@@ -57,7 +59,7 @@ def crop(image, start_row, start_col, num_rows, num_cols):
     out = None
 
     ### YOUR CODE HERE
-
+    out = image[start_row:start_row + num_rows, start_col:start_col + num_cols]
     return out
 
 
@@ -81,7 +83,7 @@ def change_contrast(image, factor):
     out = None
 
     ### YOUR CODE HERE
-
+    out = factor * (image - 0.5) + 0.5
     return out
 
 
@@ -99,7 +101,13 @@ def resize(input_image, output_rows, output_cols):
         np.ndarray: Resized image, with shape `(output_rows, output_cols, 3)`.
     """
     out = None
-    
+    out = np.zeros((output_rows, output_cols, 3))
+    input_rows, input_cols, _ = input_image.shape
+    row_scale = input_rows / output_rows
+    col_scale = input_cols / output_cols
+    for i in range(output_rows):
+        for j in range(output_cols):
+            out[i, j] = input_image[int(i * row_scale), int(j * col_scale)]
     return out
 
 def greyscale(input_image):
@@ -115,7 +123,7 @@ def greyscale(input_image):
         np.ndarray: Greyscale image, with shape `(output_rows, output_cols)`.
     """
     out = None
-
+    out = np.mean(input_image, axis=2)
     return out
 
 def conv2D(image, kernel):
@@ -132,6 +140,15 @@ def conv2D(image, kernel):
     """
     out = None
     ### YOUR CODE HERE
+    Hk, Wk = kernel.shape
+    Hi, Wi = image.shape
+    out = np.zeros((Hi, Wi))
+    for i in range(Hi):
+        for j in range(Wi):
+            for k in range(Hk):
+                for l in range(Wk):
+                    if i - k + Hk // 2 >= 0 and i - k + Hk // 2 < Hi and j - l + Wk // 2 >= 0 and j - l + Wk // 2 < Wi:
+                        out[i, j] += image[i - k + Hk // 2, j - l + Wk // 2] * kernel[k, l]
 
     return out
 
@@ -183,6 +200,12 @@ def conv(image, kernel):
     """
     out = None
     ### YOUR CODE HERE
+    if len(image.shape) == 3:
+        out = np.zeros_like(image)
+        for i in range(3):
+            out[:, :, i] = conv2D(image[:, :, i], kernel)
+    else:
+        out = conv2D(image, kernel)
 
     return out
 
