@@ -124,6 +124,25 @@ def greyscale(input_image):
     """
     out = None
     out = np.mean(input_image, axis=2)
+    out = np.expand_dims(out, axis=2)
+    return out
+
+def binary(grey_img, th):
+    """Convert a greyscale image to a binary mask with threshold.
+
+                    x_n = 0, if x_p < th
+                    x_n = 1, if x_p >= th
+
+    Inputs:
+        input_image: Greyscale image stored as an array, with shape
+            `(image_height, image_width)`.
+        th (float): The threshold used for binarization, and the value range is 0 to 1
+    Returns:
+        np.ndarray: Binary mask, with shape `(image_height, image_width)`.
+    """
+    out = None
+    out = np.zeros_like(grey_img)
+    out[grey_img >= th] = 1
     return out
 
 def conv2D(image, kernel):
